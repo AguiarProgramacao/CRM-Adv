@@ -1,0 +1,31 @@
+const express = require('express');
+const router = express.Router();
+const processoController = require('../controllers/processoController');
+const timelineController = require('../controllers/timelineController');
+const anotacaoController = require('../controllers/anotacaoController');
+const arquivoController = require('../controllers/arquivoController');
+const tarefaController = require('../controllers/tarefaController');
+
+router.get('/tarefas', tarefaController.getAllTarefas);
+router.post('/', processoController.createProcesso);
+router.get('/', processoController.getAllProcessos);
+router.get('/:id', processoController.getProcessoById);
+router.put('/:id', processoController.updateProcesso);
+router.delete('/:id', processoController.deleteProcesso);
+router.post('/:id/timeline', timelineController.createEvento);
+router.get('/:id/timeline', timelineController.getEventosByProcesso);
+router.put('/timeline/:eventoId', timelineController.updateEvento);
+router.delete('/timeline/:eventoId', timelineController.deleteEvento);
+router.post('/:id/anotacoes', anotacaoController.createAnotacao);
+router.get('/:id/anotacoes', anotacaoController.getAnotacoesByProcesso);
+router.put('/anotacoes/:anotacaoId', anotacaoController.updateAnotacao);
+router.delete('/anotacoes/:anotacaoId', anotacaoController.deleteAnotacao);
+router.post('/upload-arquivo', arquivoController.uploadArquivo);
+router.get('/:id/arquivos', arquivoController.getArquivosByProcesso);
+router.post('/:id/tarefas', tarefaController.createTarefa);
+router.get('/:id/tarefas', tarefaController.getTarefasByProcesso);
+router.put('/tarefas/:tarefaId', tarefaController.updateTarefa);
+router.delete('/tarefas/:tarefaId', tarefaController.deleteTarefa);
+router.get('/cliente/:clienteId', processoController.getProcessoByClienteId);
+
+module.exports = router;

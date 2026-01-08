@@ -1,0 +1,7 @@
+{
+  "importMap": "./import_map.json",
+  "tasks": {
+    "dev": "supabase functions serve",
+    "deploy": "supabase functions deploy"
+  }
+}

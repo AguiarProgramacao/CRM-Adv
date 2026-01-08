@@ -1,0 +1,260 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Processo {
+  id             Int      @id @default(autoincrement())
+  numero         String
+  tribunal       String
+  andamento      String
+  autor          String?
+  reu            String?
+  valor          Float?
+  areaJuridica   String?
+  descricao      String?
+  responsavelId  Int?
+  responsavel    Usuario?  @relation("ResponsavelProcesso", fields: [responsavelId], references: [id])
+  clienteId      Int?
+  cliente        Cliente?    @relation(fields: [clienteId], references: [id])
+  criadoEm       DateTime @default(now())
+  atualizadoEm   DateTime @updatedAt
+  anotacoes      Anotacao[]
+  arquivos       Arquivo[]
+  tarefas        Tarefa[]
+  agendamento    Agendamento[]
+  atendimento    Atendimento[]
+  transacao      Transacao[]
+}
+
+model Anotacao {
+  id         Int      @id @default(autoincrement())
+  conteudo   String
+  processoId Int
+  processo   Processo @relation(fields: [processoId], references: [id])
+  criadoEm   DateTime @default(now())
+  atualizadoEm DateTime @updatedAt
+}
+
+model Arquivo {
+  id         Int      @id @default(autoincrement())
+  nome       String
+  caminho    String
+  processoId Int
+  processo   Processo @relation(fields: [processoId], references: [id])
+  criadoEm   DateTime @default(now())
+}
+
+model Tarefa {
+  id             Int      @id @default(autoincrement())
+  titulo         String
+  descricao      String
+  status         StatusTarefa @default(pendente)
+  responsavelId  Int?
+  responsavel    Usuario?  @relation("ResponsavelTarefa", fields: [responsavelId], references: [id])
+  processoId     Int
+  processo       Processo @relation(fields: [processoId], references: [id])
+  dataVencimento String?
+  tipo           TipoTarefa? @default(documento)
+  prioridade     PrioridadeTarefa? @default(media)
+  criadoEm       DateTime @default(now())
+  atualizadoEm   DateTime @updatedAt
+}
+
+enum StatusTarefa {
+  pendente
+  em_andamento
+  concluida
+  cancelada
+}
+
+enum TipoTarefa {
+  acompanhamento
+  audiencia
+  documento
+  peticionamento
+  prazo
+  reunião
+}
+
+enum PrioridadeTarefa {
+  baixa
+  media
+  alta
+  urgente
+}
+
+model Agendamento {
+  id             Int       @id @default(autoincrement())
+  titulo         String
+  descricao      String
+  dataHoraInicio DateTime
+  dataHoraFim    DateTime?
+  tipo           TipoAgendamento
+  processoId     Int?
+  processo       Processo? @relation(fields: [processoId], references: [id])
+  googleEventId  String?
+  criadoEm       DateTime  @default(now())
+  atualizadoEm   DateTime  @updatedAt
+  email          String?
+  nome           String?
+}
+
+enum TipoAgendamento {
+  PRAZO
+  REUNIAO
+  OUTRO
+}
+
+model GoogleToken {
+  id           Int      @id @default(autoincrement())
+  userId       Int      @unique
+  accessToken  String
+  refreshToken String
+  scope        String
+  tokenType    String
+  expiryDate   DateTime
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Transacao {
+  id             Int     @id @default(autoincrement())
+  tipo           String
+  valor          Float
+  descricao      String
+  categoria      String
+  status         String
+  dataTransacao  DateTime
+  dataVencimento DateTime
+  processoId     Int?
+  processo       Processo? @relation(fields: [processoId], references: [id])
+  clienteId      Int?
+  cliente        Cliente?    @relation(fields: [clienteId], references: [id])
+  formaPagamento String
+}
+
+model Boleto {
+  id              Int      @id @default(autoincrement())
+  clienteId       Int
+  clienteNome     String
+  codigo          String   @unique
+  descricao       String?
+  valor           Int
+  emissao         DateTime @default(now())
+  vencimento      DateTime
+  pagoEm          DateTime?
+  status          String   @default("emitido") // emitido, pago, cancelado
+  statusVencimento String  @default("aberto")  // aberto, vencido
+  linhaDigitavel  String?
+  stripeUrl       String
+}
+
+model Cliente {
+  id              Int       @id @default(autoincrement())
+  nome            String
+  email           String   
+  telefone        String?
+  documento       String?   
+  data_nascimento String?
+  rua             String?
+  numero          String?
+  complemento     String?
+  bairro          String?
+  cidade          String?
+  estado          String?
+  cep             String?
+  observacoes     String?
+  criadoEm        DateTime  @default(now())
+  atualizadoEm    DateTime  @updatedAt
+  atendimentos    Atendimento[]
+  leads           Lead[]
+  processo        Processo[]
+  transacao       Transacao[]
+}
+
+model Atendimento {
+  id          Int       @id @default(autoincrement())
+  clienteId   Int
+  descricao   String
+  data        DateTime  @default(now())
+  processoId  Int?
+  
+  cliente     Cliente   @relation(fields: [clienteId], references: [id])
+  processo    Processo? @relation(fields: [processoId], references: [id])
+}
+
+model Lead {
+  id         Int         @id @default(autoincrement())
+  clienteId  Int         @unique
+  etapaId    Int?
+  etapa      EtapaLead?   @relation(fields: [etapaId], references: [id])
+  criadoEm   DateTime    @default(now())
+  atualizadoEm DateTime  @updatedAt
+  cliente    Cliente     @relation(fields: [clienteId], references: [id])
+}
+
+model User {
+  id           Int     @id @default(autoincrement())
+  name         String
+  email        String  @unique
+  passwordHash String
+  whatsapp     String?
+  empresa      String?
+  createdAt    DateTime @default(now())
+}
+
+model Usuario {
+  id        Int       @id @default(autoincrement())
+  nome      String
+  email     String    @unique
+  senhaHash String
+  perfil    Perfil
+  criadoEm  DateTime  @default(now())
+  tarefasResponsavel Tarefa[] @relation("ResponsavelTarefa")
+  processoResponsavel Processo[] @relation("ResponsavelProcesso")
+  instanciasWhatsapp  InstanciaWhatsApp[]
+}
+
+enum Perfil {
+  ADVOGADO
+  ESTAGIARIO
+  SOCIO
+}
+
+model EtapaLead {
+  id       Int      @id @default(autoincrement())
+  nome     String
+  ordem    Int      // Para controle visual (como "Contato Inicial" = 1, etc.)
+  criadoEm DateTime @default(now())
+  atualizadoEm DateTime @updatedAt
+
+  leads    Lead[]
+}
+
+model Mensagem {
+  id         Int      @id @default(autoincrement())
+  nome       String
+  numero     String
+  tipo       String?
+  texto      String?
+  arquivoUrl String?
+  duracao    Int?
+  criadoEm   DateTime @default(now())
+  remetente  String?
+}
+
+model InstanciaWhatsApp {
+  id             Int      @id @default(autoincrement())
+  numero         String   @unique
+  nomeInstancia  String   // <- Ex: "DevAguiar"
+  tipo           String   // 'atendente' ou 'cliente'
+  criadoEm       DateTime @default(now())
+
+  usuarioId      Int
+  usuario        Usuario  @relation(fields: [usuarioId], references: [id])
+}

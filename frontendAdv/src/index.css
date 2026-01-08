@@ -1,0 +1,97 @@
+@import "tailwindcss";
+@tailwind utilities;
+
+/* Theme */
+:root {
+  color-scheme: light;
+}
+
+.theme-light {
+  color-scheme: light;
+}
+
+.theme-dark {
+  color-scheme: dark;
+}
+
+body {
+  background-color: #f9fafb;
+  color: #111827;
+}
+
+.theme-dark body {
+  background-color: #0b1220;
+  color: #e5e7eb;
+}
+
+.theme-dark .bg-white {
+  background-color: #111827;
+}
+
+.theme-dark .bg-gray-50 {
+  background-color: #0b1220;
+}
+
+.theme-dark .bg-gray-100 {
+  background-color: #232731;
+}
+
+.theme-dark .bg-gray-200 {
+  background-color: #1f2937;
+}
+
+.theme-dark .text-black {
+  color: #9e9e9e;
+}
+
+.theme-dark .text-gray-500 {
+  color: #9ca3af;
+}
+
+.theme-dark .text-gray-600 {
+  color: #999999;
+}
+
+.theme-dark .text-gray-700 {
+  color: #e5e7eb;
+}
+
+.theme-dark .text-gray-800 {
+  color: #f3f4f6;
+}
+
+.theme-dark .text-gray-900 {
+  color: #999999;
+}
+
+.theme-dark .border-gray-100{
+  border-color:#1f2937;
+}
+
+.theme-dark .border-gray-200 {
+  border-color: #282e36;
+}
+
+.theme-dark .border-gray-300 {
+  border-color: #282e36;
+}
+
+/* global.css ou tailwind.config.js com plugin */
+
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.6s ease-out forwards;
+}
+
+@keyframes bounce-slow {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+
+.animate-bounce-slow {
+  animation: bounce-slow 1.5s infinite;
+}
